@@ -34,3 +34,12 @@ class MultilineTextInput(Widget):
         self._text.setHorizontallyResizable_(True)
 
         self._impl.setDocumentView_(self._text)
+
+    @property
+    def value(self):
+        return self._text.string
+
+    @value.setter
+    def value(self, value):
+        if value:
+            self._text.insertText_(value)
