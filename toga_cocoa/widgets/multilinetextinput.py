@@ -1,6 +1,6 @@
-from __future__ import print_function, absolute_import, division
+from __future__ import print_function, absolute_import, division, unicode_literals
 
-from ..libs import get_NSString, NSTextView, NSScrollView, NSBezelBorder
+from ..libs import NSTextView, NSScrollView, NSBezelBorder
 from .base import Widget
 
 
@@ -27,7 +27,7 @@ class MultilineTextInput(Widget):
         self._text = NSTextView.alloc().init()
 
         if self.initial:
-            self._text.insertText_(get_NSString(self.initial))
+            self._text.insertText_(self.initial)
 
         self._text.setEditable_(True)
         self._text.setVerticallyResizable_(True)
