@@ -1,4 +1,4 @@
-from __future__ import print_function, absolute_import, division
+from rubicon.objc import text
 
 from ..libs import NSTextField, NSTextFieldSquareBezel
 from .base import Widget
@@ -7,8 +7,8 @@ from .base import Widget
 class TextInput(Widget):
     _IMPL_CLASS = NSTextField
 
-    def __init__(self, initial=None, placeholder=None, readonly=False):
-        super(TextInput, self).__init__()
+    def __init__(self, initial=None, placeholder=None, readonly=False, style=None):
+        super(TextInput, self).__init__(style=style)
 
         self.startup()
 
@@ -18,10 +18,21 @@ class TextInput(Widget):
 
     def startup(self):
         self._impl = self._IMPL_CLASS.new()
+        self._impl.interface = self
 
         self._impl.setBezeled_(True)
         self._impl.setBezelStyle_(NSTextFieldSquareBezel)
+
+        # Disable all autolayout functionality
         self._impl.setTranslatesAutoresizingMaskIntoConstraints_(False)
+        self._impl.setAutoresizesSubviews_(False)
+
+        # Height of a text input is known and fixed.
+        # Width must be > 100
+        self.style.hint(
+            height=self._impl.fittingSize().height,
+            width=(100, None)
+        )
 
     @property
     def readonly(self):
@@ -44,9 +55,9 @@ class TextInput(Widget):
 
     @property
     def value(self):
-        return self._impl.stringValue()
+        return self._impl.stringValue
 
     @value.setter
     def value(self, value):
         if value:
-            self._impl.setStringValue_(value)
+            self._impl.stringValue = text(value)

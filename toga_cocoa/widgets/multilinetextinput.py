@@ -1,18 +1,14 @@
-from __future__ import print_function, absolute_import, division, unicode_literals
-
-from ..libs import NSTextView, NSScrollView, NSBezelBorder
+from ..libs import NSTextView, NSScrollView, NSBezelBorder, NSViewWidthSizable, NSViewHeightSizable
 from .base import Widget
 
 
 class MultilineTextInput(Widget):
 
-    def __init__(self, initial=None):
-        super(MultilineTextInput, self).__init__()
-        self.initial = initial
-
-        self._text = None
-
+    def __init__(self, initial=None, style=None):
+        super(MultilineTextInput, self).__init__(style=style)
         self.startup()
+
+        self.value = initial
 
     def startup(self):
         # Create a multiline view, and put it in a scroll view.
@@ -22,16 +18,26 @@ class MultilineTextInput(Widget):
         self._impl.setHasHorizontalScroller_(False)
         self._impl.setAutohidesScrollers_(False)
         self._impl.setBorderType_(NSBezelBorder)
-        self._impl.setTranslatesAutoresizingMaskIntoConstraints_(False)
+        self._impl.setAutoresizingMask_(NSViewWidthSizable | NSViewHeightSizable)
 
+        # Disable all autolayout functionality on the outer widget
+        # self._impl.setTranslatesAutoresizingMaskIntoConstraints_(False)
+        # self._impl.setAutoresizesSubviews_(False)
+
+        # self._impl.contentView.setTranslatesAutoresizingMaskIntoConstraints_(False)
+        # self._impl.contentView.setAutoresizesSubviews_(False)
+
+        # Use a dummy size initially.
         self._text = NSTextView.alloc().init()
 
-        if self.initial:
-            self._text.insertText_(self.initial)
+        # Disable all autolayout functionality on the inner widget
+        # self._text.setTranslatesAutoresizingMaskIntoConstraints_(False)
+        # self._text.setAutoresizesSubviews_(False)
 
         self._text.setEditable_(True)
         self._text.setVerticallyResizable_(True)
-        self._text.setHorizontallyResizable_(True)
+        self._text.setHorizontallyResizable_(False)
+        self._text.setAutoresizingMask_(NSViewWidthSizable)
 
         self._impl.setDocumentView_(self._text)
 
@@ -43,3 +49,9 @@ class MultilineTextInput(Widget):
     def value(self, value):
         if value:
             self._text.insertText_(value)
+
+    def _apply_layout(self, layout):
+        frame = NSRect(NSPoint(layout.left, layout.top), NSSize(layout.width, layout.height))
+        self._impl.setFrame_(frame)
+        self._impl.contentView.setFrame_(frame)
+        self._impl.setNeedsDisplay_(True)

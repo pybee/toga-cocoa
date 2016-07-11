@@ -1,13 +1,10 @@
-from __future__ import print_function, absolute_import, division, unicode_literals
-
 from ..libs import *
 from .base import Widget
-from toga.constants import *
 
 
 class ProgressBar(Widget):
-    def __init__(self, max=None, value=None):
-        super(ProgressBar, self).__init__()
+    def __init__(self, max=None, value=None, style=None):
+        super(ProgressBar, self).__init__(style=style)
         self.max = max
 
         self.startup()
@@ -17,14 +14,16 @@ class ProgressBar(Widget):
     def startup(self):
         self._impl = NSProgressIndicator.new()
         self._impl.setStyle_(NSProgressIndicatorBarStyle)
-        self._impl.setDisplayedWhenStopped_(False)
+        self._impl.setDisplayedWhenStopped_(True)
         if self.max:
             self._impl.setIndeterminate_(False)
             self._impl.setMaxValue_(self.max)
         else:
             self._impl.setIndeterminate_(True)
 
+        # Disable all autolayout functionality
         self._impl.setTranslatesAutoresizingMaskIntoConstraints_(False)
+        self._impl.setAutoresizesSubviews_(False)
 
     @property
     def value(self):

@@ -1,12 +1,11 @@
-from __future__ import print_function, absolute_import, division, unicode_literals
-
 from ..libs import *
 from .base import Widget
 
 
 class ScrollContainer(Widget):
-    def __init__(self, horizontal=True, vertical=True):
-        super(ScrollContainer, self).__init__()
+    def __init__(self, horizontal=True, vertical=True, style=None):
+        super(ScrollContainer, self).__init__(style=style)
+        self.is_container = True
         self.horizontal = horizontal
         self.vertical = vertical
 
@@ -20,7 +19,14 @@ class ScrollContainer(Widget):
         self._impl.setHasHorizontalScroller_(self.horizontal)
         self._impl.setAutohidesScrollers_(True)
         self._impl.setBorderType_(NSNoBorder)
+
+        # Disable all autolayout functionality
         self._impl.setTranslatesAutoresizingMaskIntoConstraints_(False)
+        self._impl.setAutoresizesSubviews_(False)
+
+        # Also disable autolayout on the clip view.
+        self._impl.contentView.setTranslatesAutoresizingMaskIntoConstraints_(False)
+        self._impl.contentView.setAutoresizesSubviews_(False)
 
         self._impl.setBackgroundColor_(NSColor.windowBackgroundColor())
 
@@ -42,3 +48,33 @@ class ScrollContainer(Widget):
     def _set_window(self, window):
         if self._content:
             self._content.window = self.window
+
+    def _update_child_layout(self, **style):
+        """Force a layout update on the children of the scroll container.
+
+        The update request can be accompanied by additional style information
+        (probably min_width, min_height, width or height) to control the
+        layout.
+        """
+        # print ('    content:', (self.content._impl.frame.size.width, self.content._impl.frame.size.height), (self.content._impl.frame.origin.x, self.content._impl.frame.origin.y))
+
+        # Pass the update request through to the content. Along the way, any
+        # hard width/height constraints get turned into min width/height
+        # constraints in the axes where scrolling is allowed.
+        child_style = {}
+        for key, value in style.items():
+            if key == 'width':
+                if self.horizontal:
+                    child_style['min_width'] = value
+                else:
+                    child_style[key] = value
+            elif key == 'height':
+                if self.vertical:
+                    child_style['min_height'] = value
+                else:
+                    child_style[key] = value
+            else:
+                child_style[key] = value
+
+        self._content._update_layout(**child_style)
+        self._content._apply_layout(self._content.style.layout)
