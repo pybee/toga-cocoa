@@ -3,6 +3,8 @@ from __future__ import print_function, absolute_import, division, unicode_litera
 import os
 import signal
 
+from toga.interface.app import App as AppInterface
+
 from .libs import *
 from .window import Window
 from .widgets.icon import Icon, TIBERIUS_ICON
@@ -74,7 +76,7 @@ class AppDelegate(NSObject):
             # NSDocumentController.sharedDocumentController().openDocumentWithContentsOfURL_display_completionHandler_(fileURL, True, None)
 
 
-class App(object):
+class App(AppInterface):
     def __init__(self, name, app_id, icon=None, startup=None, document_types=None):
         self.name = name
         self.app_id = app_id
