@@ -1,9 +1,10 @@
+from toga.interface import MultilineTextInput as MultilineTextInputInterface
+
 from ..libs import NSTextView, NSScrollView, NSBezelBorder, NSViewWidthSizable, NSViewHeightSizable
-from .base import Widget
+from .base import WidgetMixin
 
 
-class MultilineTextInput(Widget):
-
+class MultilineTextInput(MultilineTextInputInterface, WidgetMixin):
     def __init__(self, initial=None, style=None):
         super(MultilineTextInput, self).__init__(style=style)
         self.startup()
