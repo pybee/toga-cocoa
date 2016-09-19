@@ -69,8 +69,9 @@ class AppDelegate(NSObject):
 
 
 class App(AppInterface):
-    def __init__(self, name, app_id, icon=None, startup=None, document_types=None):
+    _MAIN_WINDOW_CLASS = MainWindow
 
+    def __init__(self, name, app_id, icon=None, startup=None, document_types=None):
         # Set the icon for the app
         Icon.app_icon = Icon.load(icon, default=TIBERIUS_ICON)
 
@@ -129,17 +130,6 @@ class App(AppInterface):
 
         # Call user code to populate the main window
         self.startup()
-
-    def startup(self):
-        # Create the main window
-        self.main_window = MainWindow(self.name)
-        self.main_window.app = self
-
-        if self._startup_method:
-            self.main_window.content = self._startup_method(self)
-
-        # Show the main window
-        self.main_window.show()
 
     def main_loop(self):
         # Stimulate the build of the app
