@@ -80,3 +80,22 @@ def stack_trace(window, title, message, content, retry=False):
         return result == NSAlertFirstButtonReturn
     else:
         alert.runModal()
+
+
+def save_file(window, title, suggested_filename, file_types):
+    panel = NSSavePanel.alloc().init()
+    panel.title = title
+
+    arr = NSArray.alloc().init()
+
+    for x in file_types:
+        arr = arr.arrayByAddingObject_(x)
+
+    panel.allowedFileTypes = arr
+    panel.nameFieldStringValue = suggested_filename
+
+    result = panel.runModal()
+
+    if result == NSFileHandlingPanelOKButton:
+        return panel.URL.path
+    return None
